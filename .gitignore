@@ -1,1 +1,5 @@
 AGENTS.md
+.nsu-cookies
+.nsu-journal-config.json
+scripts/update-index.mjs
+.nsu-journal-config.example.json
