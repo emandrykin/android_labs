@@ -31,11 +31,13 @@
     .stats { display: flex; gap: 10px; flex-wrap: wrap; }
     .stat { background: #f3f6f9; border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; font-size: 14px; white-space: nowrap; }
     .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; min-width: 900px; }
+    table { width: 100%; border-collapse: collapse; min-width: 1500px; }
     th, td { border: 1px solid var(--line); padding: 12px 14px; text-align: center; vertical-align: middle; }
     th { background: var(--green); color: #fff; font-weight: 700; position: sticky; top: 0; z-index: 1; }
     td.student { text-align: left; font-weight: 500; white-space: nowrap; background: #fff; }
     td.status { font-size: 24px; letter-spacing: 2px; }
+    th.kn-col { min-width: 78px; }
+    td.kn-status { font-size: 28px; letter-spacing: 0; }
     tr:nth-child(even) td.student, tr:nth-child(even) td.status { background: #fcfdff; }
     .legend { margin-top: 18px; padding: 16px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
     .legend h2 { margin: 0 0 10px; font-size: 18px; }
@@ -48,7 +50,7 @@
     <h1>Статус лабораторных</h1>
     <p class="subtitle">
       В ячейке две иконки: <strong>первая — оценка</strong>, <strong>вторая — PR</strong>.<br>
-      ✅ — есть, ❌ — нет. Оценки обновлены по присланным пользователем скриншотам журнала, PR-статусы сверены с <strong>NSU-VKI-Mobile/practice</strong>.
+      Для оценок: <strong>✅</strong> — зачтённая оценка, <strong>🟥</strong> — двойка, <strong>❌</strong> — оценки нет. В колонке <strong>КН</strong> показывается только оценка, без PR.
     </p>
 
     <div class="tabs" id="tabs"></div>
@@ -65,12 +67,7 @@
       <div class="table-wrap">
         <table>
           <thead>
-            <tr>
-              <th>Студент</th>
-              <th>ЛР1</th>
-              <th>ЛР2</th>
-              <th>ЛР3</th>
-            </tr>
+            <tr id="tableHeadRow"></tr>
           </thead>
           <tbody id="tableBody"></tbody>
         </table>
@@ -81,66 +78,83 @@
       <h2>Легенда</h2>
       <p><strong>✅✅</strong> — оценка есть, PR есть</p>
       <p><strong>✅❌</strong> — оценка есть, PR не найден</p>
+      <p><strong>🟥✅</strong> — в журнале стоит двойка, PR есть</p>
+      <p><strong>🟥❌</strong> — в журнале стоит двойка, PR не найден</p>
       <p><strong>❌✅</strong> — PR есть, оценки пока нет</p>
       <p><strong>❌❌</strong> — ни оценки, ни PR</p>
+      <p><strong>КН</strong> — отдельная колонка контрольной недели, там показывается только эмодзи оценки</p>
     </div>
   </div>
 
   <script>
+    const COLUMN_DEFS = [
+      { key: "lr1", label: "ЛР1", kind: "lab", lab: 1 },
+      { key: "lr2", label: "ЛР2", kind: "lab", lab: 2 },
+      { key: "lr3", label: "ЛР3", kind: "lab", lab: 3 },
+      { key: "kn", label: "КН", kind: "kn" },
+      { key: "lr4", label: "ЛР4", kind: "lab", lab: 4 },
+      { key: "lr5", label: "ЛР5", kind: "lab", lab: 5 },
+      { key: "lr6", label: "ЛР6", kind: "lab", lab: 6 },
+      { key: "lr7", label: "ЛР7", kind: "lab", lab: 7 },
+      { key: "lr8", label: "ЛР8", kind: "lab", lab: 8 },
+      { key: "lr9", label: "ЛР9", kind: "lab", lab: 9 },
+      { key: "lr10", label: "ЛР10", kind: "lab", lab: 10 }
+    ];
+
     const DATA = {
       "2307d1": {
-        note: "Автообновлено из журнала NSU и GitHub на 22.03.2026.",
+        note: "Автообновлено из журнала NSU и GitHub на 23.03.2026.",
         students: [
-          ["Валвенкин Леонид Константинович", "✅❌", "✅✅", "✅✅"],
-          ["Гагин Игорь Константинович", "✅✅", "✅❌", "❌❌"],
-          ["Губорев Николай Андреевич", "✅✅", "✅✅", "✅✅"],
-          ["Кичигин Иван Сергеевич", "❌❌", "❌❌", "❌❌"],
-          ["Кропачев Никита Дмитриевич", "✅❌", "❌❌", "❌❌"],
-          ["Кулиш Семён Артемович", "✅✅", "❌❌", "❌❌"],
-          ["Лубенцов Кирилл Денисович", "✅✅", "✅✅", "❌❌"],
-          ["Мазитова Виолетта Вильевна", "✅✅", "✅✅", "✅✅"],
-          ["Нартов Артём Сергеевич", "✅❌", "✅❌", "❌❌"],
-          ["Охотко Валерия Константиновна", "✅✅", "✅✅", "✅✅"],
-          ["Розанов Михаил Алексеевич", "✅❌", "✅❌", "✅❌"],
-          ["Сивокозова Юлия Евгеньевна", "✅✅", "❌❌", "❌❌"],
-          ["Утев Александр Евгеньевич", "✅✅", "✅✅", "❌❌"]
+          ["Валвенкин Леонид Константинович", "✅❌", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Гагин Игорь Константинович", "✅✅", "✅❌", "🟥❌", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Губорев Николай Андреевич", "✅✅", "✅✅", "✅✅", "✅", "❌✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Кичигин Иван Сергеевич", "❌❌", "❌❌", "❌❌", "❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Кропачев Никита Дмитриевич", "✅❌", "❌❌", "❌❌", "❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Кулиш Семён Артемович", "✅✅", "❌❌", "❌❌", "❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Лубенцов Кирилл Денисович", "✅✅", "✅✅", "🟥❌", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Мазитова Виолетта Вильевна", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Нартов Артём Сергеевич", "✅❌", "✅❌", "🟥❌", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Охотко Валерия Константиновна", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Розанов Михаил Алексеевич", "✅❌", "✅❌", "✅❌", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Сивокозова Юлия Евгеньевна", "✅✅", "❌❌", "❌❌", "❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Утев Александр Евгеньевич", "✅✅", "✅✅", "🟥❌", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"]
         ]
       },
       "2307d2": {
-        note: "Автообновлено из журнала NSU и GitHub на 22.03.2026.",
+        note: "Автообновлено из журнала NSU и GitHub на 23.03.2026.",
         students: [
-          ["Баранов Николай Павлович", "✅✅", "✅✅", "✅✅"],
-          ["Богданов Андрей Сергеевич", "✅✅", "✅✅", "✅✅"],
-          ["Емельянов Александр Данилович", "✅✅", "✅✅", "✅✅"],
-          ["Живицкая Дарья Сергеевна", "✅✅", "✅✅", "✅✅"],
-          ["Казаков Егор Вячеславович", "✅❌", "✅❌", "✅❌"],
-          ["Ломакин Тимофей Вячеславович", "✅✅", "✅✅", "✅✅"],
-          ["Минаев Данила Дмитриевич", "✅✅", "✅✅", "✅✅"],
-          ["Нагорнева Арина Павловна", "✅✅", "✅✅", "✅✅"],
-          ["Неручев Данил Павлович", "✅✅", "✅✅", "✅✅"],
-          ["Ожередов Вадим Михайлович", "✅✅", "❌❌", "❌❌"],
-          ["Плаксин Леонид Олегович", "✅✅", "✅✅", "✅✅"],
-          ["Слонов Дмитрий Андреевич", "✅✅", "✅✅", "✅✅"],
-          ["Столбов Леонид Игоревич", "✅✅", "✅✅", "✅✅"],
-          ["Федченко Платон Любомирович", "✅✅", "✅✅", "✅✅"],
-          ["Черныш Денис Алексеевич", "✅✅", "✅❌", "❌❌"]
+          ["Баранов Николай Павлович", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Богданов Андрей Сергеевич", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Емельянов Александр Данилович", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Живицкая Дарья Сергеевна", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Казаков Егор Вячеславович", "✅❌", "✅❌", "✅❌", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Ломакин Тимофей Вячеславович", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Минаев Данила Дмитриевич", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Нагорнева Арина Павловна", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Неручев Данил Павлович", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Ожередов Вадим Михайлович", "✅✅", "❌❌", "❌❌", "❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Плаксин Леонид Олегович", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Слонов Дмитрий Андреевич", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Столбов Леонид Игоревич", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Федченко Платон Любомирович", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Черныш Денис Алексеевич", "✅✅", "✅❌", "🟥❌", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"]
         ]
       },
       "2307e1": {
-        note: "Автообновлено из журнала NSU и GitHub на 22.03.2026.",
+        note: "Автообновлено из журнала NSU и GitHub на 23.03.2026.",
         students: [
-          ["Анашенко Елизавета Андреевна", "✅✅", "✅✅", "✅✅"],
-          ["Баженов Никита Павлович", "✅✅", "✅✅", "❌❌"],
-          ["Бердников Платон Викторович", "✅✅", "✅✅", "❌❌"],
-          ["Богатырёва Ульяна Ильинична", "✅✅", "✅✅", "✅✅"],
-          ["Варлаков Арсений Константинович", "✅✅", "✅✅", "✅✅"],
-          ["Васенин Никита Павлович", "✅✅", "✅✅", "✅✅"],
-          ["Истомина Ксения Сергеевна", "✅✅", "✅✅", "❌❌"],
-          ["Мальцев Ярослав Игоревич", "✅✅", "✅✅", "✅✅"],
-          ["Романов Максим Евгеньевич", "✅✅", "✅✅", "✅✅"],
-          ["Чегодаева Дарья Геннадьевна", "✅✅", "✅✅", "✅✅"],
-          ["Шабельников Никита Георгиевич", "✅✅", "✅✅", "❌❌"],
-          ["Шадрин Родион Антонович", "✅✅", "✅✅", "✅✅"]
+          ["Анашенко Елизавета Андреевна", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Баженов Никита Павлович", "✅✅", "✅✅", "🟥❌", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Бердников Платон Викторович", "✅✅", "✅✅", "🟥❌", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Богатырёва Ульяна Ильинична", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Варлаков Арсений Константинович", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Васенин Никита Павлович", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Истомина Ксения Сергеевна", "✅✅", "✅✅", "🟥❌", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Мальцев Ярослав Игоревич", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Романов Максим Евгеньевич", "✅✅", "✅✅", "✅✅", "✅", "✅✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Чегодаева Дарья Геннадьевна", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Шабельников Никита Георгиевич", "✅✅", "✅✅", "🟥❌", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Шадрин Родион Антонович", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"]
         ]
       }
     };
@@ -149,23 +163,58 @@
     const groupTitleEl = document.getElementById('groupTitle');
     const groupNoteEl = document.getElementById('groupNote');
     const groupStatsEl = document.getElementById('groupStats');
+    const tableHeadRowEl = document.getElementById('tableHeadRow');
     const tableBodyEl = document.getElementById('tableBody');
 
     const groups = Object.keys(DATA);
     let activeGroup = groups[0];
 
+    function defaultStatus(column) {
+      return column.kind === 'kn' ? '❌' : '❌❌';
+    }
+
+    function normalizeStatuses(row) {
+      const statuses = row.slice(1);
+      while (statuses.length < COLUMN_DEFS.length) {
+        statuses.push(defaultStatus(COLUMN_DEFS[statuses.length]));
+      }
+      return statuses.slice(0, COLUMN_DEFS.length);
+    }
+
+    function readGradeIcon(value) {
+      return Array.from(value || '')[0] || '❌';
+    }
+
     function calcStats(students) {
-      const counters = { complete: 0, gradeNoPr: 0, prNoGrade: 0, empty: 0 };
+      const counters = { complete: 0, gradeNoPr: 0, prNoGrade: 0, empty: 0, fail: 0, kn: 0 };
       for (const row of students) {
-        for (let i = 1; i <= 3; i++) {
-          const value = row[i];
-          if (value === '✅✅') counters.complete++;
-          else if (value === '✅❌') counters.gradeNoPr++;
-          else if (value === '❌✅') counters.prNoGrade++;
-          else if (value === '❌❌') counters.empty++;
-        }
+        const statuses = normalizeStatuses(row);
+        COLUMN_DEFS.forEach((column, index) => {
+          const value = statuses[index];
+          const glyphs = Array.from(value || '');
+          const grade = glyphs[0] || '❌';
+          const pr = glyphs[1] || '❌';
+
+          if (column.kind === 'kn') {
+            if (grade !== '❌') counters.kn++;
+            return;
+          }
+
+          if (grade === '🟥') counters.fail++;
+          else if (grade === '✅' && pr === '✅') counters.complete++;
+          else if (grade === '✅' && pr === '❌') counters.gradeNoPr++;
+          else if (grade === '❌' && pr === '✅') counters.prNoGrade++;
+          else counters.empty++;
+        });
       }
       return counters;
+    }
+
+    function renderTableHead() {
+      tableHeadRowEl.innerHTML = `
+        <th>Студент</th>
+        ${COLUMN_DEFS.map(column => `<th class="${column.kind === 'kn' ? 'kn-col' : ''}">${column.label}</th>`).join('')}
+      `;
     }
 
     function renderTabs() {
@@ -192,23 +241,28 @@
       groupStatsEl.innerHTML = `
         <div class="stat">✅✅: ${stats.complete}</div>
         <div class="stat">✅❌: ${stats.gradeNoPr}</div>
+        <div class="stat">🟥*: ${stats.fail}</div>
         <div class="stat">❌✅: ${stats.prNoGrade}</div>
         <div class="stat">❌❌: ${stats.empty}</div>
+        <div class="stat">КН: ${stats.kn}</div>
       `;
 
       tableBodyEl.innerHTML = '';
       group.students.forEach(student => {
+        const statuses = normalizeStatuses(student);
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td class="student">${student[0]}</td>
-          <td class="status">${student[1]}</td>
-          <td class="status">${student[2]}</td>
-          <td class="status">${student[3]}</td>
+          ${statuses.map((status, index) => {
+            const className = COLUMN_DEFS[index].kind === 'kn' ? 'status kn-status' : 'status';
+            return `<td class="${className}">${status}</td>`;
+          }).join('')}
         `;
         tableBodyEl.appendChild(tr);
       });
     }
 
+    renderTableHead();
     renderTabs();
     renderGroup();
   </script>
