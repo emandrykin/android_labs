@@ -6,52 +6,160 @@
   <title>Статус лабораторных — 2307d1 / 2307d2 / 2307e1</title>
   <style>
     :root {
+      color-scheme: light dark;
       --bg: #f4f6f8;
       --card: #ffffff;
+      --card-soft: #fbfcfd;
       --line: #dcdfe3;
       --text: #1f2937;
       --muted: #6b7280;
       --green: #69c21f;
+      --green-deep: #4ea315;
       --tab: #eef2f6;
       --tab-active: #69c21f;
       --tab-active-text: #ffffff;
+      --kn-head: #c57b16;
+      --kn-text: #2b1d08;
+      --kn-cell: #fff2dd;
+      --kn-cell-alt: #ffebcb;
+      --kn-line: #e0a548;
+      --student-cell: #ffffff;
+      --student-cell-alt: #fcfdff;
+      --status-cell-alt: #fcfdff;
+      --stat-bg: #f3f6f9;
+      --shadow-main: 0 6px 18px rgba(0,0,0,0.06);
+      --shadow-soft: 0 6px 18px rgba(0,0,0,0.04);
+      --head-text: #ffffff;
+    }
+    :root[data-theme="light"] {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --card-soft: #fbfcfd;
+      --line: #dcdfe3;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --green: #69c21f;
+      --green-deep: #4ea315;
+      --tab: #eef2f6;
+      --tab-active: #69c21f;
+      --tab-active-text: #ffffff;
+      --kn-head: #c57b16;
+      --kn-text: #2b1d08;
+      --kn-cell: #fff2dd;
+      --kn-cell-alt: #ffebcb;
+      --kn-line: #e0a548;
+      --student-cell: #ffffff;
+      --student-cell-alt: #fcfdff;
+      --status-cell-alt: #fcfdff;
+      --stat-bg: #f3f6f9;
+      --shadow-main: 0 6px 18px rgba(0,0,0,0.06);
+      --shadow-soft: 0 6px 18px rgba(0,0,0,0.04);
+      --head-text: #ffffff;
+    }
+    :root[data-theme="dark"] {
+      --bg: #08111f;
+      --card: #0f1a2b;
+      --card-soft: #132238;
+      --line: #26344c;
+      --text: #e6eefc;
+      --muted: #96a6c1;
+      --green: #6fd12e;
+      --green-deep: #4aa61a;
+      --tab: #16253c;
+      --tab-active: #6fd12e;
+      --tab-active-text: #08111f;
+      --kn-head: #c57b16;
+      --kn-text: #1a1207;
+      --kn-cell: #32200b;
+      --kn-cell-alt: #3a2710;
+      --kn-line: #e0a548;
+      --student-cell: #0d1828;
+      --student-cell-alt: #122033;
+      --status-cell-alt: #122033;
+      --stat-bg: #14253c;
+      --shadow-main: 0 18px 48px rgba(0,0,0,0.35);
+      --shadow-soft: 0 18px 48px rgba(0,0,0,0.22);
+      --head-text: #08111f;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]):not([data-theme="dark"]) {
+        --bg: #08111f;
+        --card: #0f1a2b;
+        --card-soft: #132238;
+        --line: #26344c;
+        --text: #e6eefc;
+        --muted: #96a6c1;
+        --green: #6fd12e;
+        --green-deep: #4aa61a;
+        --tab: #16253c;
+        --tab-active: #6fd12e;
+        --tab-active-text: #08111f;
+        --kn-head: #c57b16;
+        --kn-text: #1a1207;
+        --kn-cell: #32200b;
+        --kn-cell-alt: #3a2710;
+        --kn-line: #e0a548;
+        --student-cell: #0d1828;
+        --student-cell-alt: #122033;
+        --status-cell-alt: #122033;
+        --stat-bg: #14253c;
+        --shadow-main: 0 18px 48px rgba(0,0,0,0.35);
+        --shadow-soft: 0 18px 48px rgba(0,0,0,0.22);
+        --head-text: #08111f;
+      }
     }
     * { box-sizing: border-box; }
     body { margin: 0; padding: 32px; font-family: Arial, sans-serif; background: var(--bg); color: var(--text); }
     .wrap { max-width: 1300px; margin: 0 auto; }
+    .topbar { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 20px; }
+    .topbar-copy { min-width: 0; }
     h1 { margin: 0 0 8px; font-size: 30px; }
-    .subtitle { margin: 0 0 20px; color: var(--muted); font-size: 15px; line-height: 1.45; }
+    .subtitle { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.45; }
+    .theme-btn { border: 1px solid var(--line); background: var(--card); color: var(--text); padding: 10px 14px; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 700; white-space: nowrap; box-shadow: var(--shadow-soft); }
     .tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
     .tab-btn { border: 1px solid var(--line); background: var(--tab); color: var(--text); padding: 10px 16px; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 700; }
     .tab-btn.active { background: var(--tab-active); color: var(--tab-active-text); border-color: var(--tab-active); }
-    .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 6px 18px rgba(0,0,0,0.06); overflow: hidden; }
-    .group-head { display: flex; justify-content: space-between; gap: 16px; align-items: center; padding: 18px 20px; border-bottom: 1px solid var(--line); background: #fbfcfd; flex-wrap: wrap; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow-main); overflow: hidden; }
+    .group-head { display: flex; justify-content: space-between; gap: 16px; align-items: center; padding: 18px 20px; border-bottom: 1px solid var(--line); background: var(--card-soft); flex-wrap: wrap; }
     .group-title { font-size: 22px; font-weight: 700; margin: 0; }
     .group-note { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
     .stats { display: flex; gap: 10px; flex-wrap: wrap; }
-    .stat { background: #f3f6f9; border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; font-size: 14px; white-space: nowrap; }
+    .stat { background: var(--stat-bg); border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; font-size: 14px; white-space: nowrap; }
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; min-width: 1500px; }
     th, td { border: 1px solid var(--line); padding: 12px 14px; text-align: center; vertical-align: middle; }
-    th { background: var(--green); color: #fff; font-weight: 700; position: sticky; top: 0; z-index: 1; }
-    td.student { text-align: left; font-weight: 500; white-space: nowrap; background: #fff; }
+    th { background: linear-gradient(180deg, #78da37 0%, var(--green-deep) 100%); color: var(--head-text); font-weight: 700; position: sticky; top: 0; z-index: 1; }
+    td.student { text-align: left; font-weight: 500; white-space: nowrap; background: var(--student-cell); }
     td.status { font-size: 24px; letter-spacing: 2px; }
-    th.kn-col { min-width: 78px; }
-    td.kn-status { font-size: 28px; letter-spacing: 0; }
-    tr:nth-child(even) td.student, tr:nth-child(even) td.status { background: #fcfdff; }
-    .legend { margin-top: 18px; padding: 16px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+    th.kn-col { min-width: 78px; background: linear-gradient(180deg, #e1a23d 0%, var(--kn-head) 100%); color: var(--kn-text); }
+    td.kn-status { font-size: 28px; letter-spacing: 0; background: var(--kn-cell) !important; border-left-color: var(--kn-line); border-right-color: var(--kn-line); }
+    tr:nth-child(even) td.student, tr:nth-child(even) td.status { background: var(--status-cell-alt); }
+    tr:nth-child(even) td.kn-status { background: var(--kn-cell-alt) !important; }
+    .legend { margin-top: 18px; padding: 16px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow-soft); }
     .legend h2 { margin: 0 0 10px; font-size: 18px; }
     .legend p { margin: 6px 0; color: var(--text); }
-    @media (max-width: 720px) { body { padding: 16px; } h1 { font-size: 24px; } .group-title { font-size: 20px; } td.status { font-size: 20px; } }
+    @media (max-width: 720px) {
+      body { padding: 16px; }
+      .topbar { flex-direction: column; align-items: stretch; }
+      .theme-btn { width: 100%; }
+      h1 { font-size: 24px; }
+      .group-title { font-size: 20px; }
+      td.status { font-size: 20px; }
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>Статус лабораторных</h1>
-    <p class="subtitle">
-      В ячейке две иконки: <strong>первая — оценка</strong>, <strong>вторая — PR</strong>.<br>
-      Для оценок: <strong>✅</strong> — зачтённая оценка, <strong>🟥</strong> — двойка, <strong>❌</strong> — оценки нет. В колонке <strong>КН</strong> показывается только оценка, без PR.
-    </p>
+    <div class="topbar">
+      <div class="topbar-copy">
+        <h1>Статус лабораторных</h1>
+        <p class="subtitle">
+          В ячейке две иконки: <strong>первая — оценка</strong>, <strong>вторая — PR</strong>.<br>
+          Для оценок: <strong>✅</strong> — зачтённая оценка, <strong>🟥</strong> — двойка, <strong>❌</strong> — оценки нет. В колонке <strong>КН</strong> показывается только оценка, без PR.
+        </p>
+      </div>
+      <button class="theme-btn" id="themeToggle" type="button"></button>
+    </div>
 
     <div class="tabs" id="tabs"></div>
 
@@ -103,25 +211,25 @@
 
     const DATA = {
       "2307d1": {
-        note: "Автообновлено из журнала NSU и GitHub на 23.03.2026.",
+        note: "Автообновлено из журнала NSU и GitHub на 24.03.2026.",
         students: [
           ["Валвенкин Леонид Константинович", "✅❌", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
           ["Гагин Игорь Константинович", "✅✅", "✅❌", "🟥❌", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
-          ["Губорев Николай Андреевич", "✅✅", "✅✅", "✅✅", "✅", "❌✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
-          ["Кичигин Иван Сергеевич", "❌❌", "❌❌", "❌❌", "❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
-          ["Кропачев Никита Дмитриевич", "✅❌", "❌❌", "❌❌", "❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
-          ["Кулиш Семён Артемович", "✅✅", "❌❌", "❌❌", "❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Губорев Николай Андреевич", "✅✅", "✅✅", "✅✅", "✅", "✅✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Кичигин Иван Сергеевич", "🟥❌", "🟥❌", "🟥❌", "❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Кропачев Никита Дмитриевич", "✅❌", "🟥❌", "🟥❌", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Кулиш Семён Артемович", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
           ["Лубенцов Кирилл Денисович", "✅✅", "✅✅", "🟥❌", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
           ["Мазитова Виолетта Вильевна", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
           ["Нартов Артём Сергеевич", "✅❌", "✅❌", "🟥❌", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
           ["Охотко Валерия Константиновна", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
           ["Розанов Михаил Алексеевич", "✅❌", "✅❌", "✅❌", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
-          ["Сивокозова Юлия Евгеньевна", "✅✅", "❌❌", "❌❌", "❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Сивокозова Юлия Евгеньевна", "✅✅", "✅✅", "🟥❌", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
           ["Утев Александр Евгеньевич", "✅✅", "✅✅", "🟥❌", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"]
         ]
       },
       "2307d2": {
-        note: "Автообновлено из журнала NSU и GitHub на 23.03.2026.",
+        note: "Автообновлено из журнала NSU и GitHub на 24.03.2026.",
         students: [
           ["Баранов Николай Павлович", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
           ["Богданов Андрей Сергеевич", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
@@ -132,7 +240,7 @@
           ["Минаев Данила Дмитриевич", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
           ["Нагорнева Арина Павловна", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
           ["Неручев Данил Павлович", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
-          ["Ожередов Вадим Михайлович", "✅✅", "❌❌", "❌❌", "❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
+          ["Ожередов Вадим Михайлович", "✅✅", "❌❌", "❌❌", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
           ["Плаксин Леонид Олегович", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
           ["Слонов Дмитрий Андреевич", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
           ["Столбов Леонид Игоревич", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
@@ -141,7 +249,7 @@
         ]
       },
       "2307e1": {
-        note: "Автообновлено из журнала NSU и GitHub на 23.03.2026.",
+        note: "Автообновлено из журнала NSU и GitHub на 24.03.2026.",
         students: [
           ["Анашенко Елизавета Андреевна", "✅✅", "✅✅", "✅✅", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
           ["Баженов Никита Павлович", "✅✅", "✅✅", "🟥❌", "✅", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌", "❌❌"],
@@ -165,9 +273,11 @@
     const groupStatsEl = document.getElementById('groupStats');
     const tableHeadRowEl = document.getElementById('tableHeadRow');
     const tableBodyEl = document.getElementById('tableBody');
+    const themeToggleEl = document.getElementById('themeToggle');
 
     const groups = Object.keys(DATA);
     let activeGroup = groups[0];
+    let manualTheme = getCookie('theme');
 
     function defaultStatus(column) {
       return column.kind === 'kn' ? '❌' : '❌❌';
@@ -217,6 +327,49 @@
       `;
     }
 
+    function getSystemTheme() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    function getEffectiveTheme() {
+      return manualTheme === 'dark' || manualTheme === 'light' ? manualTheme : getSystemTheme();
+    }
+
+    function applyTheme() {
+      if (manualTheme === 'dark' || manualTheme === 'light') {
+        document.documentElement.dataset.theme = manualTheme;
+      } else {
+        delete document.documentElement.dataset.theme;
+      }
+      renderThemeButton();
+    }
+
+    function renderThemeButton() {
+      const effectiveTheme = getEffectiveTheme();
+      const nextTheme = effectiveTheme === 'dark' ? 'light' : 'dark';
+      themeToggleEl.textContent = nextTheme === 'dark' ? 'Включить темную тему' : 'Включить светлую тему';
+    }
+
+    function getCookie(name) {
+      return document.cookie
+        .split(';')
+        .map(part => part.trim())
+        .filter(Boolean)
+        .map(part => part.split('='))
+        .find(([key]) => key === name)?.[1] || '';
+    }
+
+    function setCookie(name, value, maxAgeSeconds) {
+      document.cookie = `${name}=${value}; path=/; max-age=${maxAgeSeconds}; samesite=lax`;
+    }
+
+    function toggleTheme() {
+      const nextTheme = getEffectiveTheme() === 'dark' ? 'light' : 'dark';
+      manualTheme = nextTheme;
+      setCookie('theme', nextTheme, 60 * 60 * 24 * 365);
+      applyTheme();
+    }
+
     function renderTabs() {
       tabsEl.innerHTML = '';
       groups.forEach(group => {
@@ -262,6 +415,14 @@
       });
     }
 
+    themeToggleEl.addEventListener('click', toggleTheme);
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      if (manualTheme !== 'dark' && manualTheme !== 'light') {
+        applyTheme();
+      }
+    });
+
+    applyTheme();
     renderTableHead();
     renderTabs();
     renderGroup();
